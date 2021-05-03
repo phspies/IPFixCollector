@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace IPFixCollector.Modules.Netflow.v10
 {
     public enum FieldType : ushort

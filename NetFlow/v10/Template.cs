@@ -9,40 +9,40 @@ namespace IPFixCollector.Modules.Netflow.v10
     [Serializable]
     public class Template
     {
-        private UInt16 _id;
-        private UInt32 _domain_id;
-        private UInt16 _count;
-        private UInt16 _length;
+        private ushort _id;
+        private uint _domain_id;
+        private ushort _count;
+        private ushort _length;
         private List<Field> _field;
 
-        private Byte[] _bytes;
+        private byte[] _bytes;
 
-        public UInt16 ID
+        public ushort ID
         {
             get
             {
-                return this._id;
+                return _id;
             }
         }
-        public UInt32 DomainID
+        public uint DomainID
         {
             get
             {
-                return this._domain_id;
+                return _domain_id;
             }
         }
-        public UInt16 Count
+        public ushort Count
         {
             get
             {
-                return this._count;
+                return _count;
             }
         }
-        public UInt16 Length
+        public ushort Length
         {
             get
             {
-                return this._length;
+                return _length;
             }
         }
 
@@ -50,16 +50,16 @@ namespace IPFixCollector.Modules.Netflow.v10
         {
             get
             {
-                return this._field;
+                return _field;
             }
         }
 
-        public UInt16 FieldLength
+        public ushort FieldLength
         {
             get
             {
-                UInt16 len = 0;
-                foreach (Field fields in this._field)
+                ushort len = 0;
+                foreach (Field fields in _field)
                 {
                     len += fields.Length;
                 }
@@ -67,43 +67,44 @@ namespace IPFixCollector.Modules.Netflow.v10
             }
         }
 
-        public Template(Byte[] bytes, int _start_pointer, UInt32 _domain_id)
+        public Template(byte[] bytes, int _start_pointer, uint _domain_id)
         {
-            this._bytes = bytes;
-            this.Parse(_start_pointer, _domain_id);
+            _bytes = bytes;
+            Parse(_start_pointer, _domain_id);
         }
 
-        private void Parse(int _start_pointer, UInt32 _domain_id)
+        private void Parse(int _start_pointer, uint _domain_id)
         {
-            byte[] reverse = this._bytes.Reverse().ToArray();
-            this._field = new List<Field>();
-            this._id = BitConverter.ToUInt16(reverse, this._bytes.Length - _start_pointer);
-            this._count = BitConverter.ToUInt16(reverse, this._bytes.Length - _start_pointer - 2);
-            this._domain_id = _domain_id;
+            byte[] reverse = _bytes.Reverse().ToArray();
+            _field = new List<Field>();
+            _id = BitConverter.ToUInt16(reverse, _bytes.Length - _start_pointer);
+            _count = BitConverter.ToUInt16(reverse, _bytes.Length - _start_pointer - 2);
+            Template template = this;
+            template._domain_id = _domain_id;
             int _pointer = _start_pointer + 2;
-            for (int i = 0; i < this._count; i++)
+            for (int i = 0; i < _count; i++)
             {
-                Byte[] _pen_byte = new Byte[1];
-                Array.Copy(this._bytes, _pointer, _pen_byte, 0, 1);
-                char[] _bits = Convert.ToString(_pen_byte[0], 2).PadLeft(8, '0').ToArray();
+                byte[] _pen_byte = new byte[1];
+                Array.Copy(_bytes, _pointer, _pen_byte, 0, 1);
+                _ = Convert.ToString(_pen_byte[0], 2).PadLeft(8, '0').ToArray();
                 if (new BitArray(_pen_byte).Get(7) == true)
                 {
                     //we have a enterprise number which uses 8 bytes
-                    Byte[] bfield = new Byte[8];
-                    Array.Copy(this._bytes, _pointer, bfield, 0, 8);
+                    byte[] bfield = new byte[8];
+                    Array.Copy(_bytes, _pointer, bfield, 0, 8);
                     Field field = new Field(bfield, true);
-                    this._field.Add(field);
+                    _field.Add(field);
                     _pointer += 8;
-                    this._length += 8;
+                    _length += 8;
                 }
                 else
                 {
-                    Byte[] bfield = new Byte[4];
-                    Array.Copy(this._bytes, _pointer, bfield, 0, 4);
+                    byte[] bfield = new byte[4];
+                    Array.Copy(_bytes, _pointer, bfield, 0, 4);
                     Field field = new Field(bfield, false);
-                    this._field.Add(field);
+                    _field.Add(field);
                     _pointer += 4;
-                    this._length += 4;
+                    _length += 4;
                 }
             }
         }

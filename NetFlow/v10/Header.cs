@@ -7,75 +7,45 @@ namespace IPFixCollector.Modules.Netflow.v10
 {
 	public class V10Header
 	{
-		private UInt16 _version;
-		private UInt16 _lenght;
-		private UInt32 _exporttime;
-		private UInt32 _sequencenumber;
-		private UInt32 _obdomainid;
+        private byte[] _bytes;
 
-        private Byte[] _bytes;
-
-		public UInt16 Version
-		{
-			get
-			{
-				return this._version;
-			}
-		}
-        public UInt32 DomainID
-        {
-            get
-            {
-                return this._obdomainid;
-            }
-        }
-        public UInt16 Lenght
-		{
-			get
-			{
-                return this._lenght;
-			}
-		}
+        public ushort Version { get; private set; }
+        public uint DomainID { get; private set; }
+        public ushort Lenght { get; private set; }
         public DateTime ExportTime
 		{
 			get
 			{
-                return new DateTime(1970, 1, 1).AddSeconds(this._exporttime);
+                return new DateTime(1970, 1, 1).AddSeconds(Exporttime);
 			}
 		}
-        public UInt32 SequinceNumber
+        public uint SequinceNumber { get; private set; }
+        public uint Sequence
 		{
 			get
 			{
-                return this._sequencenumber;
-			}
-		}
-		public UInt32 Sequence
-		{
-			get
-			{
-                return this._obdomainid;
+                return DomainID;
 			}
 		}
 
+        public uint Exporttime { get; set; }
+
         public V10Header(Byte[] bytes)
         {
-            this._bytes = bytes;
-            this.Parse();
+            _bytes = bytes;
+            Parse();
         }
 
         private void Parse()
         {
-            if(this._bytes.Length == 16)
+            if(_bytes.Length == 16)
             {
-                byte[] reverse = this._bytes.Reverse().ToArray();
-
-                this._version = BitConverter.ToUInt16(reverse, this._bytes.Length - sizeof(Int16) - 0);
-                this._lenght = BitConverter.ToUInt16(reverse, this._bytes.Length - sizeof(Int16) - 2);
-
-                this._exporttime = BitConverter.ToUInt32(reverse, this._bytes.Length - sizeof(UInt32) - 4);
-                this._sequencenumber = BitConverter.ToUInt32(reverse, this._bytes.Length - sizeof(Int32) - 8);
-                this._obdomainid = BitConverter.ToUInt32(reverse, this._bytes.Length - sizeof(Int32) - 12);
+                byte[] reverse = _bytes.Reverse().ToArray();
+                Version = BitConverter.ToUInt16(reverse, _bytes.Length - sizeof(short) - 0);
+                Lenght = BitConverter.ToUInt16(reverse, _bytes.Length - sizeof(short) - 2);
+                Exporttime = BitConverter.ToUInt32(reverse, _bytes.Length - sizeof(uint) - 4);
+                SequinceNumber = BitConverter.ToUInt32(reverse, _bytes.Length - sizeof(int) - 8);
+                DomainID = BitConverter.ToUInt32(reverse, _bytes.Length - sizeof(int) - 12);
             }
         }
 	}

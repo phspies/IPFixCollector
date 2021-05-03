@@ -9,13 +9,13 @@ namespace IPFixCollector.Modules.Netflow
     class NetflowCommon
     {
         public ushort _version;
-        private Byte[] _bytes;
+        private byte[] _bytes;
 
-        public NetflowCommon(Byte[] bytes)
+        public NetflowCommon(byte[] bytes)
         {
-            this._bytes = bytes;
-            byte[] reverse = this._bytes.Reverse().ToArray();
-            this._version = BitConverter.ToUInt16(reverse, this._bytes.Length - sizeof(Int16) - 0);
+            _bytes = bytes;
+            byte[] reverse = _bytes.Reverse().ToArray();
+            _version = BitConverter.ToUInt16(reverse, _bytes.Length - sizeof(short) - 0);
         }
     }
 }
