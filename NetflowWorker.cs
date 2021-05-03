@@ -6,8 +6,6 @@ using IPFixCollector.Modules.Netflow.v9;
 using IPFixCollector.Modules.Netflow.v10;
 using IPFixCollector.Modules.Netflow;
 using IPFixCollector.Modules.Netflow.V5;
-using System.Threading;
-using System.IO;
 using Newtonsoft.Json;
 using IPFixCollector.DataModel;
 
@@ -28,7 +26,7 @@ namespace IPFixCollector.NetflowCollection
                 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 IPEndPoint iep = new IPEndPoint(IPAddress.Any, 9996);
                 sock.Bind(iep);
-                EndPoint ep = (EndPoint)iep;
+                EndPoint ep = iep;
                 byte[] data = new byte[2048];
 
                 while (true)
@@ -62,48 +60,49 @@ namespace IPFixCollector.NetflowCollection
                                 foreach (Modules.Netflow.v9.Template _template in _flowset.Template.Where(x => x.Field.Any(y => y.Value.Count != 0)))
                                 {
 
-                                    NetworkFlow _netflow = new NetworkFlow();
+                                    NetworkFlow networkFlow = new NetworkFlow();
+                                    NetworkFlow _netflow = networkFlow;
 
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV4_SRC_ADDR))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV4_SRC_ADDR))
                                     {
-                                        _netflow.source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV4_SRC_ADDR).Value.ToArray()).ToString();
-                                        _netflow.target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV4_DST_ADDR).Value.ToArray()).ToString();
+                                        _netflow.Source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV4_SRC_ADDR).Value.ToArray()).ToString();
+                                        _netflow.Target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV4_DST_ADDR).Value.ToArray()).ToString();
                                     }
-                                    else if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV6_SRC_ADDR))
+                                    else if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV6_SRC_ADDR))
                                     {
-                                        _netflow.source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV6_SRC_ADDR).Value.ToArray()).ToString();
-                                        _netflow.target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IPV6_DST_ADDR).Value.ToArray()).ToString();
+                                        _netflow.Source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV6_SRC_ADDR).Value.ToArray()).ToString();
+                                        _netflow.Target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IPV6_DST_ADDR).Value.ToArray()).ToString();
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.L4_SRC_PORT))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.L4_SRC_PORT))
                                     {
-                                        _netflow.source_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.L4_SRC_PORT).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Source_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.L4_SRC_PORT).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.L4_DST_PORT))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.L4_DST_PORT))
                                     {
-                                        _netflow.target_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.L4_DST_PORT).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Target_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.L4_DST_PORT).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.PROTOCOL))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.PROTOCOL))
                                     {
-                                        _netflow.protocol = _template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.PROTOCOL).Value[0];
+                                        _netflow.Protocol = _template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.PROTOCOL).Value[0];
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.FIRST_SWITCHED))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.FIRST_SWITCHED))
                                     {
-                                        _netflow.start_timestamp = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.FIRST_SWITCHED).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Start_timestamp = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.FIRST_SWITCHED).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.LAST_SWITCHED))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.LAST_SWITCHED))
                                     {
-                                        _netflow.stop_timestamp = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.LAST_SWITCHED).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Stop_timestamp = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.LAST_SWITCHED).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    _netflow.timestamp = DateTime.UtcNow;
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IN_PKTS))
+                                    _netflow.Timestamp = DateTime.UtcNow;
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IN_PKTS))
                                     {
-                                        _netflow.packets = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IN_PKTS).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Packets = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IN_PKTS).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IN_BYTES))
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IN_BYTES))
                                     {
-                                        _netflow.kbyte = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v9.FieldType.IN_BYTES).Value.ToArray().Reverse().ToArray(), 0);
+                                        _netflow.Kbyte = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v9.FieldType.IN_BYTES).Value.ToArray().Reverse().ToArray(), 0);
                                     }
-                                    _netflow.id = Guid.NewGuid().ToString().Replace("-", "");
+                                    _netflow.Id = Guid.NewGuid().ToString().Replace("-", "");
 
                                     if (debug_netflow)
                                     {
@@ -123,25 +122,27 @@ namespace IPFixCollector.NetflowCollection
                             {
                                 foreach (Modules.Netflow.v10.Template _template in _flowset.Template.Where(x => x.Field.Any(y => y.Type == "sourceTransportPort" && y.Value.Count > 0)))
                                 {
-                                    NetworkFlow _netflow = new NetworkFlow();
-                                    _netflow.id = Guid.NewGuid().ToString().Replace("-", "");
-                                    _netflow.source_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.sourceTransportPort).Value.ToArray().Reverse().ToArray(), 0);
-                                    _netflow.target_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.destinationTransportPort).Value.ToArray().Reverse().ToArray(), 0);
-                                    _netflow.protocol = _template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.protocolIdentifier).Value[0];
-                                    _netflow.start_timestamp = (long)BitConverter.ToUInt64(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.flowStartMilliseconds).Value.ToArray().Reverse().ToArray(), 0);
-                                    _netflow.stop_timestamp = (long)BitConverter.ToUInt64(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.flowEndMilliseconds).Value.ToArray().Reverse().ToArray(), 0);
-                                    _netflow.timestamp = DateTime.UtcNow;
-                                    _netflow.packets = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.packetDeltaCount).Value.ToArray().Reverse().ToArray(), 0);
-                                    _netflow.kbyte = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.octetDeltaCount).Value.ToArray().Reverse().ToArray(), 0);
-                                    if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.sourceIPv4Address))
+                                    NetworkFlow _netflow = new NetworkFlow
                                     {
-                                        _netflow.source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.sourceIPv4Address).Value.ToArray()).ToString();
-                                        _netflow.target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.destinationIPv4Address).Value.ToArray()).ToString();
+                                        Id = Guid.NewGuid().ToString().Replace("-", ""),
+                                        Source_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.sourceTransportPort).Value.ToArray().Reverse().ToArray(), 0),
+                                        Target_port = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.destinationTransportPort).Value.ToArray().Reverse().ToArray(), 0),
+                                        Protocol = _template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.protocolIdentifier).Value[0],
+                                        Start_timestamp = (long)BitConverter.ToUInt64(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.flowStartMilliseconds).Value.ToArray().Reverse().ToArray(), 0),
+                                        Stop_timestamp = (long)BitConverter.ToUInt64(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.flowEndMilliseconds).Value.ToArray().Reverse().ToArray(), 0),
+                                        Timestamp = DateTime.UtcNow,
+                                        Packets = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.packetDeltaCount).Value.ToArray().Reverse().ToArray(), 0),
+                                        Kbyte = BitConverter.ToUInt16(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.octetDeltaCount).Value.ToArray().Reverse().ToArray(), 0)
+                                    };
+                                    if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.sourceIPv4Address))
+                                    {
+                                        _netflow.Source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.sourceIPv4Address).Value.ToArray()).ToString();
+                                        _netflow.Target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.destinationIPv4Address).Value.ToArray()).ToString();
                                     }
-                                    else if (_template.Field.Exists(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.sourceIPv6Address))
+                                    else if (_template.Field.Exists(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.sourceIPv6Address))
                                     {
-                                        _netflow.source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.sourceIPv6Address).Value.ToArray()).ToString();
-                                        _netflow.target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (UInt16)Modules.Netflow.v10.FieldType.destinationIPv6Address).Value.ToArray()).ToString();
+                                        _netflow.Source_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.sourceIPv6Address).Value.ToArray()).ToString();
+                                        _netflow.Target_address = new IPAddress(_template.Field.FirstOrDefault(x => x.GetTypes() == (ushort)Modules.Netflow.v10.FieldType.destinationIPv6Address).Value.ToArray()).ToString();
                                     }
                                     if (debug_netflow)
                                     {
@@ -164,16 +165,6 @@ namespace IPFixCollector.NetflowCollection
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
-        }
-        static private int IpToInt32(string ipAddress)
-        {
-
-            return BitConverter.ToInt32(IPAddress.Parse(ipAddress).GetAddressBytes().Reverse().ToArray(), 0);
-        }
-
-        static private string Int32ToIp(uint ipAddress)
-        {
-            return new IPAddress(BitConverter.GetBytes(ipAddress).Reverse().ToArray()).ToString();
         }
     }
 }

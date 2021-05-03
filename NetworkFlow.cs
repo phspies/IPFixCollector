@@ -6,19 +6,19 @@ namespace IPFixCollector.DataModel
     public class NetworkFlow
     {
         [Key, StringLength(50)]
-        public string id { get; set; }
+        public string Id { get; set; }
         [StringLength(50)]
-        public string source_address { get; set; }
+        public string Source_address { get; set; }
         [StringLength(50)]
-        public string target_address { get; set; }
-        public int source_port { get; set; }
-        public int target_port { get; set; }
-        public int protocol { get; set; }
-        public DateTime timestamp { get; set; }
-        public long start_timestamp { get; set; }
-        public long stop_timestamp { get; set; }
-        public int packets { get; set; }
-        public int kbyte { get; set; }
+        public string Target_address { get; set; }
+        public int Source_port { get; set; }
+        public int Target_port { get; set; }
+        public int Protocol { get; set; }
+        public DateTime Timestamp { get; set; }
+        public long Start_timestamp { get; set; }
+        public long Stop_timestamp { get; set; }
+        public int Packets { get; set; }
+        public int Kbyte { get; set; }
 
     }
 }
