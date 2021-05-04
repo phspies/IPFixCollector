@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace IPFixCollector.Modules.Netflow.v10
 {
-	public class V10Header
+    public class V10Header
 	{
         private byte[] _bytes;
 

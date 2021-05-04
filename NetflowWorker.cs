@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net;
-using IPFixCollector.Modules.Netflow.v9;
-using IPFixCollector.Modules.Netflow.v10;
+﻿using IPFixCollector.DataModel;
 using IPFixCollector.Modules.Netflow;
+using IPFixCollector.Modules.Netflow.v10;
 using IPFixCollector.Modules.Netflow.V5;
+using IPFixCollector.Modules.Netflow.v9;
 using Newtonsoft.Json;
-using IPFixCollector.DataModel;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IPFixCollector.NetflowCollection
 {
@@ -15,7 +16,7 @@ namespace IPFixCollector.NetflowCollection
     {
         public void Start()
         {
-            const  bool debug_netflow = true;
+            const bool debug_netflow = true;
 
             TemplatesV10 _templates_v10 = new TemplatesV10();
             TemplatesV9 _templates_v9 = new TemplatesV9();
@@ -149,6 +150,10 @@ namespace IPFixCollector.NetflowCollection
                                         Console.WriteLine(String.Format("Received {0}v netflow packet: {1}", common._version, JsonConvert.SerializeObject(_netflow), Formatting.Indented));
                                     }
                                 }
+                            }
+                            else
+                            {
+                                Console.WriteLine(String.Format("Template not known for this flow yet: {0}", packet.FlowSet.First().ID));
                             }
                         }
                     }

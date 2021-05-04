@@ -6,93 +6,94 @@ using System.Linq;
 namespace IPFixCollector.Modules.Netflow.v10
 {
     [Serializable]
-	public class Field
-	{
+    public class Field
+    {
         private bool _pentype;
-        private UInt32 _pen;
-        private UInt16 _type;
-		private UInt16 _length;
-		private List<Byte> _value;
+        private uint _pen;
+        private ushort _type;
+        private ushort _length;
+        private List<byte> _value;
 
-        private Byte[] _bytes;
+        private byte[] _bytes;
 
-		public String Type
-		{
-			get
-			{
-                return Field.FieldTypes(this._type);
-			}
-		}
-
-        public UInt16 GetTypes()
-        {
-            return this._type;
-        }
-
-		public UInt16 Length
-		{
-			get
-			{
-                return this._length;
-			}
-		}
-        public Boolean EnterpriseType
+        public string Type
         {
             get
             {
-                return this._pentype;
+                return FieldTypes(_type);
             }
         }
-        public UInt32 EnterpriseNumber
+
+        public ushort GetTypes()
+        {
+            return _type;
+        }
+
+        public ushort Length
         {
             get
             {
-                return this._pen;
+                return _length;
+            }
+        }
+        public bool EnterpriseType
+        {
+            get
+            {
+                return _pentype;
+            }
+        }
+        public uint EnterpriseNumber
+        {
+            get
+            {
+                return _pen;
             }
         }
 
-        public List<Byte> Value
-		{
-			get
-			{
-                return this._value;
-			}
-			set
-			{
-                this._value = value;
-			}
-		}
-
-        public Field(Byte[] bytes, bool _pen_type = false)
+        public List<byte> Value
         {
-            this._bytes = bytes;
-            this._pentype = _pen_type;
-            this.Parse();
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                _value = value;
+            }
+        }
+
+        public Field(byte[] bytes, bool _pen_type = false)
+        {
+            _bytes = bytes;
+            _pentype = _pen_type;
+            Parse();
         }
 
         private void Parse()
         {
-            this._value = new List<byte>();
-            byte[] reverse = this._bytes.Reverse().ToArray();
+            Field field = this;
+            field._value = new List<byte>();
+            byte[] reverse = field._bytes.Reverse().ToArray();
 
-            if (this._bytes.Length == 4 || this._bytes.Length == 8)
+            if (field._bytes.Length == 4 || field._bytes.Length == 8)
             {
                 if (_pentype)
                 {
-                    this._pen = BitConverter.ToUInt32(reverse, 0);
-                    this._length = BitConverter.ToUInt16(reverse, 4);
+                    field._pen = BitConverter.ToUInt32(reverse, 0);
+                    field._length = BitConverter.ToUInt16(reverse, 4);
                     Byte[] _info_element = new Byte[2];
                     Array.Copy(reverse, 6, _info_element, 0, 2);
                     BitArray _bit_array = new BitArray(_info_element);
                     _bit_array.Set(15, false);
                     var array = new int[1];
                     _bit_array.CopyTo(array, 0);
-                    this._type = (ushort)array[0];
+                    field._type = (ushort)array[0];
                 }
                 else
                 {
-                    this._type = BitConverter.ToUInt16(reverse, this._bytes.Length - sizeof(Int16) - 0);
-                    this._length = BitConverter.ToUInt16(reverse, this._bytes.Length - sizeof(Int16) - 2);
+                    field._type = BitConverter.ToUInt16(reverse, field._bytes.Length - sizeof(Int16) - 0);
+                    field._length = BitConverter.ToUInt16(reverse, field._bytes.Length - sizeof(Int16) - 2);
                 }
             }
         }
@@ -101,5 +102,5 @@ namespace IPFixCollector.Modules.Netflow.v10
             FieldType _type = (FieldType)Enum.Parse(typeof(FieldType), Types.ToString());
             return _type.ToString();
         }
-	}
+    }
 }
